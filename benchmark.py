@@ -2,8 +2,10 @@ from concurrent.futures import thread
 from datetime import datetime
 import logging
 from random import randint
+from shutil import move
 from sqlite3 import Time
 from threading import Thread
+
 from selenium import webdriver
 from PIL import Image
 import time
@@ -67,18 +69,24 @@ class Benchmark(object):
         df=pd.DataFrame(columns=["date","casenumber","description"],data=data)
         df.to_csv(self.name + "-" + self.case_num + "_events.csv")
 
-    def __init__(self,search_text) -> None:
+    def __init__(self) -> None:
       
         self.driver=webdriver.Chrome("chromedriver.exe")
         self.url="https://court.baycoclerk.com/BenchmarkWeb2/Home.aspx/Search"
-        self.name=search_text.strip()
-        self.load_first_page(self.name)
-        self.caselist=[]
+        
+        
     
     def export_list(self):
+        xp="/html/body/div[3]/table/tbody/tr/td[2]/div/table/tbody/tr/td/table/tbody/tr[2]/td[2]/div[2]/form/button"
+        export_button=self.driver.find_element(By.XPATH,xp)
+        export_button.click()
+        time.sleep(2)
         fn="SearchResults.csv"
-        if os.path.exists(fn):
-            os.rename(fn,self.name + "_export.csv")
+        src=os.path.join(os.environ["HOMEPATH"],"downloads",fn)
+        if os.path.exists(src):
+            move(src=src,dst= self.name + "_export.csv")
+            
+           
     
     def load_list(self):
         fn=self.name + "_export.csv"
@@ -86,13 +94,20 @@ class Benchmark(object):
             self.data_frame=pd.read_csv(fn)
             return len(self.data_frame)
 
-    def load_first_page(self,searchfor):
+    def search_for_name(self,searchfor):
         self.driver.get(self.url)  
+
+        self.name=searchfor.strip()
+        
         time.sleep(2)
         search_by_name_textbox=self.driver.find_element(By.XPATH,"/html/body/div[3]/table/tbody/tr/td[2]/div/table/tbody/tr/td/table/tbody/tr[3]/td[2]/div/div/div[1]/div/div[1]/input")
         search_by_name_textbox.send_keys(searchfor)
+        logging.info(searchfor)
+        xp="/html/body/div[3]/table/tbody/tr/td[2]/div/table/tbody/tr/td/table/tbody/tr[3]/td[2]/div/div/div[4]/form/button"
+        elem=self.driver.find_element(By.XPATH,xp)
+        elem.click()
 
-   
+    
 
         
     def select_100_records(self):
@@ -106,7 +121,13 @@ class Benchmark(object):
         button_next.click()
         time.sleep(4)
 
+    def new_search(self):
+        xp="/html/body/div[3]/table/tbody/tr/td[2]/div/table/tbody/tr/td/table/tbody/tr[2]/td[2]/table/tbody/tr/td/div/div[2]/a"
+        button_search=self.driver.find_element(By.XPATH,xp)
+        button_search.click()
+
     def get_cases_from_caselist(self):
+        self.data_frame=None
         self.export_list()
         self.load_list()
         df=self.data_frame
@@ -138,7 +159,7 @@ class Benchmark(object):
 
             
             except:
-                logging.error(casenumber)
+                logging.error(self.name)
                 error_count = error_count + 1
 
         return i - error_count  #total rows less the errors
@@ -161,19 +182,19 @@ class Benchmark(object):
     #def init_name_search(self,name_string):
 
 def main():
-    search_string="PELL, ROBERT ALLAN"
+    
 
-    scraper=Benchmark(search_string)
+    scraper=Benchmark()
 
   #  atty.select_100_records()
-    new_records=scraper.get_cases_from_caselist()
+    searches=[]
+    searchdf=pd.read_csv("searches.csv")
+    for search_string in searchdf["Search"]:
+        scraper.search_for_name(search_string)
+        new_records=scraper.get_cases_from_caselist()
     
-  
-    case_count=int(scraper.driver.find_element(By.XPATH,"/html/body/div[3]/table/tbody/tr/td[2]/div/table/tbody/tr/td/table/tbody/tr[2]/td[2]/table/tbody/tr/td/div/div[1]/div[1]/div[3]").text.strip().split("\n")[1])
+      
 
-    print(str(casecount) + " total cases for " + search_string)
-    print(str(new_records) + " net records added")
-   
   #  for i in range(1,case_count+1):
    #     print(i)   
     #    atty.get_case_by_index(i)

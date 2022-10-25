@@ -1,6 +1,7 @@
 from asyncio.log import logger
 from datetime import datetime
 from importlib.resources import path
+from operator import concat
 from textwrap import indent
 from typing import Dict
 from bs4 import BeautifulSoup
@@ -96,8 +97,44 @@ class case_reader(object):
                 
                 data.append(new_row)
             df=pd.DataFrame(data=data,columns=["party_type","party_name","attorney_name","casenumber"])
-                
+            
+            return df
+
+    def get_charges(self):
+        grid=self.soup.find(id="gridCharges")
+        if grid is not None:
+            headers=[h.text.strip() for h in grid.find("thead").find_all("th")]
+            headers.append('casenumber')
+            rows=grid.find("tbody").find_all("tr")
+            data=[]
+
+            for row in rows:
+                new_row=[col.text.strip() for col in row.find_all("td")]
+                new_row.append(self.case_num)
+                #new_row={"Count": eventdate,"casenumber": str(self.case_num), "description":description}
+                data.append(new_row)
+
+            df=pd.DataFrame(data=data,columns=headers)
+            
            
+            return df
+    def get_events(self):
+        grid=self.soup.find(id="gridCaseEvents")
+        if grid is not None:
+            headers=[h.text.strip() for h in grid.find("thead").find_all("th")][:-1]
+            headers.append('casenumber')
+            rows=grid.find("tbody").find_all("tr")
+            data=[]
+
+            for row in rows:
+                vals=[col.text.strip() for col in row.find_all("td")]
+                vals.append(self.case_num)
+                data.append(vals)
+               
+            if len(data[0])==2:
+                data=None
+            df=pd.DataFrame(data=data,columns=headers)
+            df["casenumber"]=self.case_num
             return df
 
     def log_event(self,source,message):
@@ -142,7 +179,8 @@ class case_reader(object):
         else:
             logging.debug("gridDockets not found")
         #df.to_csv("csv\\" + self.name.replace(".htm","_dockets.csv"))
-        
+
+      
 
 
 errorlist=[]
@@ -151,15 +189,21 @@ errorlist=[]
 Parties=[]
 Dockets=[]
 Summaries=[]
+Charges=[]
+Events=[]
+
 htmlfiles=[x for x in os.listdir("htm") if x.endswith(".htm")]
 for i,f in enumerate(htmlfiles):
     print(i,f)
    
     cr=case_reader("htm\\" + f)
+    Events.append(cr.get_events())
+    Charges.append(cr.get_charges())
     Dockets.append(cr.get_dockets())
     Summaries.append(cr.props)
     Parties.append(cr.get_parties())
-
+    
+ 
     
 dfDockets=pd.concat(Dockets)
 dfDockets_clean=dfDockets[dfDockets["description"] != '']
@@ -174,7 +218,10 @@ dfSummaries.to_csv("all_summaries.csv")
 dfParties=pd.concat(Parties)
 dfParties.to_csv("all_parties.csv")
 
+dfCharges=pd.concat(Charges)
+dfCharges.to_csv("all_charges.csv")
 
-print(dfDockets.head())
-print(dfSummaries.head())
-print(dfParties.head())
+dfEvents=pd.concat(Events)
+dfEvents.to_csv("all_events.csv")
+
+print(dfCharges.head())
