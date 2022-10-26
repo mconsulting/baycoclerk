@@ -158,18 +158,18 @@ class case_reader(object):
                 
                 eventdate=cols[1].text.strip()
                 description=cols[2].text.strip()
-                if self.prefix in str(description):  # we are going from newest to oldest so we can just overwrite the
+                #if self.prefix in str(description):  # we are going from newest to oldest so we can just overwrite the
                                                 #old value if there are multiple instances of the search term in the list
                     #self.props["first_appeared"]=eventdate
-                    bfound=True
+                    #bfound=True
                     #self.props["status"] += "Search term " + self.prefix + " found"
                    
                 new_row={"eventdate": eventdate,"casenumber": str(self.case_num), "description":description}
                 data.append(new_row)
 
 
-            if bfound==False:
-                print(self.prefix + " not in " + self.name)
+            #if bfound==False:
+                #print(self.prefix + " not in " + self.name)
                 #self.props["first_appeared"]=self.props["clerkfiledate"]
                 #self.props["status"] = "Search term " + self.prefix + " NOT found"
            # logging.debug(data)
