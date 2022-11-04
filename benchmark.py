@@ -43,7 +43,7 @@ class Benchmark(object):
             fn=self.name + "_" + case_num + ".htm"
             with open("htm\\" + fn,"w") as f:
                 f.write(html)
-        
+            print(str(len(html)) + " bytes downloadede for file " + fn)
         except:
             print("error")
         
@@ -73,6 +73,7 @@ class Benchmark(object):
       
         self.driver=webdriver.Chrome("chromedriver.exe")
         self.url="https://court.baycoclerk.com/BenchmarkWeb2/Home.aspx/Search"
+        self.driver.get(self.url)
         
         
     
@@ -143,6 +144,7 @@ class Benchmark(object):
                 casenumber=df.iloc[i,2]
                 fn=self.name + "_" + casenumber + ".htm"
                 if os.path.exists("htm\\" + fn):
+                    logging.info("file already exists for " + self.name)
                     continue
                 case_link=self.driver.find_element(By.LINK_TEXT,casenumber)
                 case_link.click()
@@ -159,10 +161,10 @@ class Benchmark(object):
 
             
             except:
-                logging.error(self.name)
                 error_count = error_count + 1
+                logging.error(self.name + "-" + str(error_count))
 
-        return i - error_count  #total rows less the errors
+        return row_count - error_count  #total rows less the errors
 
 
     def get_case_by_index(self, ordinal_position):
@@ -181,20 +183,24 @@ class Benchmark(object):
             print("error in get_case()" + str(ordinal_position))
     #def init_name_search(self,name_string):
 
-def main():
-    
 
+    
+    
+      
+def search_by_caselist():
     scraper=Benchmark()
 
   #  atty.select_100_records()
     searches=[]
-    searchdf=pd.read_csv("searches.csv")
-    for search_string in searchdf["Search"]:
-        scraper.search_for_name(search_string)
-        new_records=scraper.get_cases_from_caselist()
-    
-      
+    searchdf=pd.read_csv("attorneys2.csv")
+    attorneys= searchdf[searchdf["Status"]=="x"]["attorney_name"]
+    for attorney in attorneys:
+        search_string= attorney
 
+  
+        scraper.search_for_name(search_string)
+        
+        new_records=scraper.get_cases_from_caselist()
   #  for i in range(1,case_count+1):
    #     print(i)   
     #    atty.get_case_by_index(i)
@@ -202,5 +208,7 @@ def main():
        # atty.get_events()
        # atty.move_next()
         #df=pd.DataFrame(atty.caselist)
-        #df.to_csv("csv\\" + search_string + "_caselist.csv")
-main()
+def main():
+    search_by_caselist()
+
+main() 
