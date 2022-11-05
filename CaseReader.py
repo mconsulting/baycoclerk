@@ -191,7 +191,7 @@ Dockets=[]
 Summaries=[]
 Charges=[]
 Events=[]
-cases=list(pd.read_csv("all_summaries.csv")["casenumber"])
+#cases=list(pd.read_csv("all_summaries.csv")["casenumber"])
 
 htmlfiles=[x for x in os.listdir("htm") if x.endswith(".htm")]
 for i,f in enumerate(htmlfiles):
@@ -204,8 +204,8 @@ for i,f in enumerate(htmlfiles):
     Dockets.append(cr.get_dockets())
     Summaries.append(cr.props)
     Parties.append(cr.get_parties())
-    cases.append(cr.case_num)   
-    print(cr.case_num + " added")
+    #cases.append(cr.case_num)   
+    #print(cr.case_num + " added")
     
 dfDockets=pd.concat(Dockets)
 dfDockets_clean=dfDockets[dfDockets["description"] != '']
@@ -226,4 +226,4 @@ dfCharges.to_csv("all_charges.csv")
 dfEvents=pd.concat(Events)
 dfEvents.to_csv("all_events.csv")
 
-print(dfCharges.head())
+

@@ -192,8 +192,8 @@ def search_by_caselist():
 
   #  atty.select_100_records()
     searches=[]
-    searchdf=pd.read_csv("attorneys2.csv")
-    attorneys= searchdf[searchdf["Status"]=="x"]["attorney_name"]
+    searchdf=pd.read_csv("attorneys.csv")
+    attorneys= searchdf["attorney_name"]
     for attorney in attorneys:
         search_string= attorney
 
