@@ -1,4 +1,4 @@
-,judge,casenumber,clerkfiledate,totalfees,agencyreportnumber,courttype,uniformcase,statusdate,bookingnumber,custodylocation,casetype,status,waivespeedytrial,agency,foreclosure
+line,judge,casenumber,clerkfiledate,totalfees,agencyreportnumber,courttype,uniformcase,statusdate,bookingnumber,custodylocation,casetype,status,waivespeedytrial,agency,foreclosure
 0,,00000740TOMA,2000-07-19,32.00,,Other Traffic,032000IN000740TOAXMX,2004-03-31,,,,CLOSED,,BAY COUNTY SHERIFF,
 1,,00032149TR,2000-11-21,0.00,,Civil Traffic,032000TR032149XXXXXX,2001-01-05,,,,CLOSED,,PANAMA CITY POLICE,
 2,,01000037TR,2001-01-02,0.00,,Civil Traffic,032001TR000037XXXXXX,2001-01-12,,,,CLOSED,,FLORIDA HIGHWAY PATROL,
