@@ -43,7 +43,7 @@ class Benchmark(object):
             fn=self.name + "_" + case_num + ".htm"
             with open("htm\\" + fn,"w") as f:
                 f.write(html)
-            print(str(len(html)) + " bytes downloadede for file " + fn)
+            print(str(len(html)) + " bytes downloaded for file " + fn)
         except:
             print("error")
         
@@ -78,15 +78,17 @@ class Benchmark(object):
         
     
     def export_list(self):
-        xp="/html/body/div[3]/table/tbody/tr/td[2]/div/table/tbody/tr/td/table/tbody/tr[2]/td[2]/div[2]/form/button"
-        export_button=self.driver.find_element(By.XPATH,xp)
-        export_button.click()
-        time.sleep(2)
-        fn="SearchResults.csv"
-        src=os.path.join(os.environ["HOMEPATH"],"downloads",fn)
-        if os.path.exists(src):
-            move(src=src,dst= self.name + "_export.csv")
-            
+        try:
+            xp="/html/body/div[3]/table/tbody/tr/td[2]/div/table/tbody/tr/td/table/tbody/tr[2]/td[2]/div[2]/form/button"
+            export_button=self.driver.find_element(By.XPATH,xp)
+            export_button.click()
+            time.sleep(2)
+            fn="SearchResults.csv"
+            src=os.path.join(os.environ["HOMEPATH"],"downloads",fn)
+            if os.path.exists(src):
+                move(src=src,dst= self.name + "_export.csv")
+        except:
+            print(self.name)
            
     
     def load_list(self):
@@ -96,7 +98,7 @@ class Benchmark(object):
             return len(self.data_frame)
 
     def search_for_name(self,searchfor):
-        self.driver.get(self.url)  
+        #self.driver.get(self.url)  
 
         self.name=searchfor.strip()
         
@@ -192,7 +194,7 @@ def search_by_caselist():
 
   #  atty.select_100_records()
     searches=[]
-    searchdf=pd.read_csv("attorneys.csv")
+    searchdf=pd.read_csv("csv\\attorneys_queue.csv")
     attorneys= searchdf["attorney_name"]
     for attorney in attorneys:
         search_string= attorney
@@ -200,7 +202,9 @@ def search_by_caselist():
   
         scraper.search_for_name(search_string)
         
-        new_records=scraper.get_cases_from_caselist()
+        scraper.export_list()
+        scraper.new_search()
+       # new_records=scraper.get_cases_from_caselist()
   #  for i in range(1,case_count+1):
    #     print(i)   
     #    atty.get_case_by_index(i)
