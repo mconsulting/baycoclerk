@@ -1,8 +1,6 @@
 # baycoclerk
-Python webscraper for baycoclerk
 
-### this may very well be the most significant thing I have aside from the fact that the other side cannot put forth an actual person to discuss it with me -- because I did it.
-
+In investigating the series of strange occurrences involving local law enforcement involving myself, I discovered a common link between them.  I believe it to be an ongoing conspiracy lead by a group of attorneys surrounding Lynn McArthur.
 
 
 
